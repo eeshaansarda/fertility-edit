@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button';
+import { ArrowDown } from 'lucide-react';
 import Link from 'next/link';
-import { IoIosArrowRoundDown } from "react-icons/io";
 
 export default function Home() {
   return (
-    <section className="min-h-screen flex flex-col items-center justify-center text-center px-4 py-20 bg-gradient-to-b from-white to-[#F9EBE0]">
+    <section className="min-h-screen flex flex-col items-center justify-center text-center px-4 py-20 bg-background">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-5xl font-extrabold mb-6 text-gray-900">
           The Fertility Edit
@@ -12,17 +12,16 @@ export default function Home() {
         <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
           Cut through the noise. Real reviews and expert insight on fertility products; all in one place.
         </p>
-        <Link 
-          href="/categories"
-          className="inline-flex items-center justify-center rounded-2xl bg-[#e7ded1] px-6 py-3 text-lg font-medium text-[#7c7570] hover:bg-[#e7ded1c4] transition-colors"
-        >
-          Explore Products
-        </Link>
+        <Button asChild>
+          <Link href="/products" >
+            Explore Products
+          </Link>
+        </Button>
       </div>
       
-      <div className="mt-16 text-3xl animate-bounce">
-        <Link href="/categories">
-          <IoIosArrowRoundDown />
+      <div className="mt-16 animate-bounce">
+        <Link href="/products">
+          <ArrowDown size={24} />
         </Link>
       </div>
     </section>
