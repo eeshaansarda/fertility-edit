@@ -1,4 +1,0 @@
-# Ignore Prisma generated client files
-prisma/generated/
-lib/generated/
-node_modules/
