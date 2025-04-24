@@ -88,8 +88,7 @@ export default function ProductForm({
 
       const savedProduct = await response.json();
 
-      toast({
-        title: isEditing ? "Product Updated" : "Product Created",
+      toast.message(isEditing ? "Product Updated" : "Product Created", {
         description: `Successfully ${isEditing ? "updated" : "added"} ${savedProduct.name}`,
       });
 
@@ -97,11 +96,7 @@ export default function ProductForm({
       router.refresh();
     } catch (error) {
       console.error("Error saving product:", error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save product",
-        variant: "destructive",
-      });
+      toast.error(error instanceof Error ? error.message : "Failed to save product");
     } finally {
       setIsSubmitting(false);
     }
