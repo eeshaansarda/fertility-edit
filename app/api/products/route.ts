@@ -4,7 +4,7 @@ import { slugify } from "@/lib/utils";
 import { productSchema } from "@/app/productSchema";
 import { z } from "zod";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const products = await prisma.product.findMany();
     
