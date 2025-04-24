@@ -27,7 +27,7 @@ const productsData: Prisma.ProductCreateInput[] = [
     },
     {
     slug: 'fertility-friendly-lube',
-    name: 'Fertility-Friendly Lubricant',
+    name: 'Fertility Friendly Lubricant',
     description: 'Designed to support sperm motility and conception.',
     category: 'FERTILITY_FRIENDLY',
     price: 14.99,

@@ -21,7 +21,7 @@ const Navbar = () => {
 
           {/*Navbar components*/}
 
-          <div className="md:flex items-center space-x-4">
+          <div className="flex items-center space-x-4">
             <Button variant="ghost" className="flex items-center gap-2" asChild>
               <Link href="/products">
                 <ShoppingBasket />
