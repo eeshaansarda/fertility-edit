@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
 import { productSchema } from "@/app/productSchema";
+import { z } from "zod";
 
 export async function GET(request: NextRequest) {
   try {

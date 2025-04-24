@@ -1,5 +1,3 @@
-//import CategoryCards from "@/app/components/Categories";
-
 import ProductCard from "@/app/components/ProductCard";
 import { Product } from "@/lib/generated/prisma";
 
