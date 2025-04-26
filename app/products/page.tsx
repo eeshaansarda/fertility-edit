@@ -8,8 +8,9 @@ const ProductsPage = async () => {
   const response = await fetch(`${origin}/api/products`);
   const products: Product[] = await response.json();
   return (
-    <div className="p-8">
-      <div className="flex flex-col gap-4">
+    <div className="flex flex-col items-center p-8">
+      <div>Filters</div>
+      <div className="flex flex-col w-full max-w-7xl gap-4">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
