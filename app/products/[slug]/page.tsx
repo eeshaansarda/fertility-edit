@@ -15,7 +15,7 @@ import { Product } from "@/lib/generated/prisma";
 export const dynamic = 'force-dynamic'
 
 // Generate metadata for the page
-export async function generateMetadata({ params }: { params: { slug: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const origin = process.env.BASE_URL ?? 'http://localhost:3000';
   const response = await fetch(`${origin}/api/products/${slug}`);
@@ -47,7 +47,7 @@ function getCategoryLabel(category: string): string {
 }
 
 
-export default async function ProductPage({ params }: { params: { slug: string } }) {
+export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const origin = process.env.BASE_URL ?? 'http://localhost:3000';
   const response = await fetch(`${origin}/api/products/${slug}`);
