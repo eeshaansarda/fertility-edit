@@ -53,12 +53,12 @@ export default async function ProductPage({ params }: { params: { slug: string }
   const response = await fetch(`${origin}/api/products/${slug}`);
   const product: Product = await response.json();
 
-  if (!product) {
+  if (!product.id) {
     notFound();
   }
 
   return (
-    <div className="container p-8">
+    <div className="container mx-auto p-8">
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
         <div className="relative aspect-square rounded-lg overflow-hidden">
           <Image
