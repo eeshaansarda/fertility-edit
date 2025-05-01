@@ -38,31 +38,6 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-    {/*
-    <header className="sticky top-0 z-40 w-full border-b bg-background">
-      <div className="container flex items-center h-16 space-x-4 sm:justify-between sm:space-x-0">
-        <div className="flex items-center gap-6 md:gap-10">
-          <Link href="/" className="text-lg font-bold">
-            The Fertility Edit
-          </Link>
-          <nav className="hidden gap-6 md:flex">
-            <a 
-            href="/products"
-            className="flex items-center text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-            >
-              Products
-            </a>
-            <a
-              href="/about"
-              className="flex items-center text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-            >
-              Guides
-            </a>
-          </nav>
-        </div>
-      </div>
-    </header>
-  */}
     </nav>
   )
 };
