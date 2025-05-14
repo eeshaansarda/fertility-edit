@@ -3,10 +3,63 @@ import prisma from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
 import { productSchema } from "@/app/productSchema";
 import { z } from "zod";
+import { Category } from "@/lib/generated/prisma";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+
+    // Parse filter parameters
+  const category = searchParams.get("category") as Category | undefined;
+  const search = searchParams.get("search");
+  const minPrice = searchParams.get("minPrice") ? Number(searchParams.get("minPrice")) : undefined;
+  const maxPrice = searchParams.get("maxPrice") ? Number(searchParams.get("maxPrice")) : undefined;
+  const minRating = searchParams.get("minRating") ? Number(searchParams.get("minRating")) : undefined;
+  const sort = searchParams.get("sort");
+  
+  // Build query filters
+  const filters: any = {};
+  
+  if (category) {
+    filters.category = category;
+  }
+  
+  if (search) {
+    filters.OR = [
+      { name: { contains: search, mode: 'insensitive' } },
+      { description: { contains: search, mode: 'insensitive' } },
+    ];
+  }
+  
+  if (minPrice !== undefined) {
+    filters.price = { gte: minPrice };
+  }
+  
+  if (maxPrice !== undefined) {
+    filters.price = { ...filters.price, lte: maxPrice };
+  }
+  
+  if (minRating !== undefined) {
+    filters.rating = { gte: minRating };
+  }
+  
+  // Build sort options
+  let orderBy: any = { createdAt: 'desc' };
+  
+  if (sort === 'price_asc') {
+    orderBy = { price: 'asc' };
+  } else if (sort === 'price_desc') {
+    orderBy = { price: 'desc' };
+  } else if (sort === 'rating_desc') {
+    orderBy = { rating: 'desc' };
+  } else if (sort === 'name_asc') {
+    orderBy = { name: 'asc' };
+  }
+
   try {
-    const products = await prisma.product.findMany();
+    const products = await prisma.product.findMany({
+      where: filters,
+      orderBy
+    });
     
     return NextResponse.json(products);
   } catch (error) {

@@ -8,15 +8,7 @@ import {
   Package, 
   LayoutGrid 
 } from "lucide-react";
-
-enum Category {
-  OVULATION_TESTS = "ovulation-tests",
-  SUPPLEMENTS = "supplements",
-  FERTILITY_FRIENDLY = "fertility-friendly",
-  PREGNANCY_TESTS = "pregnancy-tests",
-  APPS_TRACKERS = "apps-trackers",
-  OTHER = "other",
-}
+import { Category } from "@/lib/generated/prisma";
 
 interface CategoryCardsProps {
   selectedCategory?: Category;
@@ -41,7 +33,7 @@ const categories = [
   },
   {
     id: Category.FERTILITY_FRIENDLY,
-    name: "Fertility-Friendly Products",
+    name: "Fertility Friendly Products",
     icon: Heart,
   },
   {
