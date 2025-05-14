@@ -2,6 +2,11 @@ import { Button } from '@/components/ui/button';
 import { ArrowDown } from 'lucide-react';
 import Link from 'next/link';
 
+export const metadata = {
+  title: "The Fertility Edit | Curated Fertility Products",
+  description: "Cut through the noise. Real reviews and expert insight on fertility products; all in one place.",
+};
+
 export default function Home() {
   return (
     <section className="min-h-screen flex flex-col items-center justify-center text-center px-4 py-20 bg-background">
