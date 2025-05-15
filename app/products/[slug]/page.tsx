@@ -3,6 +3,10 @@ import Image from "next/image";
 import { Star, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+
 import {
   Card,
   CardContent,
@@ -159,6 +163,41 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           </CardContent>
         </Card>
       )}
+
+      {/* Comments Section */}
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold mb-4">Comments</h2>
+
+        <Card className="p-6 space-y-6">
+          {/* Existing comments (mocked) */}
+          <div className="space-y-4">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="flex gap-4 items-start">
+                <Avatar>
+                  <AvatarImage src="" alt="User" />
+                  <AvatarFallback>U{i + 1}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 space-y-1">
+                  <p className="font-semibold text-sm">User {i + 1}</p>
+                  <p className="text-muted-foreground text-sm">
+                    This product was really helpful! Would recommend to others.
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Separator />
+
+          {/* Add new comment */}
+          <div className="space-y-2">
+            <h3 className="text-lg font-medium">Add a Comment</h3>
+            <Textarea placeholder="Write your comment here..." />
+            <Button className="mt-2">Post Comment</Button>
+          </div>
+        </Card>
+      </div>
+
     </div>
   );
 }
