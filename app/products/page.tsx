@@ -79,8 +79,10 @@ const ProductsPage = () => {
     router.push(newUrl, { scroll: false });
   }, [filters, searchTerm, router]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
   };
 
   const handleFilterChange = (newFilters: Partial<FilterState>) => {
@@ -97,20 +99,19 @@ const ProductsPage = () => {
   const activeFilterCount = Object.values(filters).filter(Boolean).length;
 
   return (
-    <div className="container py-8">
+    <div className="container py-8 mx-auto">
       <div className="flex flex-col items-center justify-center pb-4">
         <div className="w-full max-w-3xl mx-auto flex gap-2">
-          <form onSubmit={handleSearch} className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </form>
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={handleSearch}
+              className="pl-10"
+            />
+          </div>
           <Button 
             variant="outline" 
             size="icon" 
