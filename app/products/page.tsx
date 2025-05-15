@@ -1,6 +1,5 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -12,20 +11,19 @@ import { Category } from "@/lib/generated/prisma";
 import FilterPanel from "../components/FilterPanel";
 import { FilterState } from "@/types";
 
-const ProductsPage = () => {
+// Separate component that uses useSearchParams
+function ProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
-
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-
   const [filters, setFilters] = useState<FilterState>({});
-
+  
   // Initialize filters from URL whenever the query string changes
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(searchParams.toString());
     setFilters({
       category: params.get("category") as Category | undefined,
       minPrice: params.get("minPrice") ? Number(params.get("minPrice")) : undefined,
@@ -35,20 +33,18 @@ const ProductsPage = () => {
     });
     setSearchTerm(params.get("search") || "");
   }, [searchParams]);
-
+  
   // Fetch products from API when filters or search term changes
   useEffect(() => {
     async function fetchProducts() {
       setLoading(true);
       const queryParams = new URLSearchParams();
-
       if (filters.category) queryParams.set("category", filters.category);
       if (filters.minPrice) queryParams.set("minPrice", filters.minPrice.toString());
       if (filters.maxPrice) queryParams.set("maxPrice", filters.maxPrice.toString());
       if (filters.minRating) queryParams.set("minRating", filters.minRating.toString());
       if (filters.sort) queryParams.set("sort", filters.sort);
       if (searchTerm) queryParams.set("search", searchTerm);
-
       try {
         const response = await fetch(`/api/products?${queryParams.toString()}`);
         if (!response.ok) throw new Error("Failed to fetch products");
@@ -60,44 +56,41 @@ const ProductsPage = () => {
         setLoading(false);
       }
     }
-
     fetchProducts();
   }, [filters, searchTerm]);
-
+  
   // Push filters to URL
   useEffect(() => {
     const params = new URLSearchParams();
-
     if (filters.category) params.set("category", filters.category);
     if (filters.minPrice) params.set("minPrice", filters.minPrice.toString());
     if (filters.maxPrice) params.set("maxPrice", filters.maxPrice.toString());
     if (filters.minRating) params.set("minRating", filters.minRating.toString());
     if (filters.sort) params.set("sort", filters.sort);
     if (searchTerm) params.set("search", searchTerm);
-
     const newUrl = `/products?${params.toString()}`;
     router.push(newUrl, { scroll: false });
   }, [filters, searchTerm, router]);
-
+  
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
     }
   };
-
+  
   const handleFilterChange = (newFilters: Partial<FilterState>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
   };
-
+  
   const resetFilters = () => {
     setFilters({});
     setSearchTerm("");
     setShowFilters(false);
   };
-
+  
   // Count active filters
   const activeFilterCount = Object.values(filters).filter(Boolean).length;
-
+  
   return (
     <div className="container py-8 mx-auto">
       <div className="flex flex-col items-center justify-center pb-4">
@@ -138,7 +131,6 @@ const ProductsPage = () => {
           </div>
         )}
       </div>
-
       <div className="w-full max-w-7xl mx-auto">
         <div className="mb-4 flex justify-between items-center">
           <h2 className="text-xl font-semibold">
@@ -150,7 +142,6 @@ const ProductsPage = () => {
             </Button>
           )}
         </div>
-
         {loading ? (
           <div className="grid grid-cols-1 w-full gap-3 md:gap-4">
             {[...Array(4)].map((_, i) => (
@@ -178,6 +169,46 @@ const ProductsPage = () => {
         )}
       </div>
     </div>
+  );
+}
+
+// Loading fallback component
+function ProductsLoading() {
+  return (
+    <div className="container py-8 mx-auto">
+      <div className="flex flex-col items-center justify-center pb-4">
+        <div className="w-full max-w-3xl mx-auto flex gap-2">
+          <div className="relative flex-1">
+            <Skeleton className="h-10 w-full" />
+          </div>
+          <Skeleton className="h-10 w-10" />
+        </div>
+      </div>
+      <div className="w-full max-w-7xl mx-auto">
+        <div className="mb-4">
+          <Skeleton className="h-8 w-48" />
+        </div>
+        <div className="grid grid-cols-1 w-full gap-3 md:gap-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="border rounded-lg p-4">
+              <Skeleton className="h-10 w-full mb-4" />
+              <Skeleton className="h-3 w-3/4 mb-2" />
+              <Skeleton className="h-2 w-full mb-2" />
+              <Skeleton className="h-1 w-1/2" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Main component with Suspense
+const ProductsPage = () => {
+  return (
+    <Suspense fallback={<ProductsLoading />}>
+      <ProductsContent />
+    </Suspense>
   );
 };
 
