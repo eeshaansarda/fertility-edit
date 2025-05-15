@@ -12,12 +12,11 @@ import {
 } from "@/components/ui/card";
 import { Product } from "@/lib/generated/prisma";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
-// Generate metadata for the page
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const origin = process.env.BASE_URL ?? 'http://localhost:3000';
+  const origin = process.env.BASE_URL ?? "http://localhost:3000";
   const response = await fetch(`${origin}/api/products/${slug}`);
   const product: Product = await response.json();
   if (!product) {
@@ -32,7 +31,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-// Helper function to get category display name
 function getCategoryLabel(category: string): string {
   const labels: Record<string, string> = {
     OVULATION_TESTS: "Ovulation Tests",
@@ -42,14 +40,12 @@ function getCategoryLabel(category: string): string {
     APPS_TRACKERS: "Apps & Trackers",
     OTHER: "Other",
   };
-  
   return labels[category] || category;
 }
 
-
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const origin = process.env.BASE_URL ?? 'http://localhost:3000';
+  const origin = process.env.BASE_URL ?? "http://localhost:3000";
   const response = await fetch(`${origin}/api/products/${slug}`);
   const product: Product = await response.json();
 
@@ -58,9 +54,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   }
 
   return (
-    <div className="container mx-auto p-8">
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-        <div className="relative aspect-square rounded-lg overflow-hidden">
+    <div className="container mx-auto p-4 md:p-10 max-w-6xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Image */}
+        <div className="relative aspect-square w-full overflow-hidden rounded-xl shadow">
           <Image
             src={product.imageUrl || ""}
             alt={product.name}
@@ -69,13 +66,18 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             className="object-cover"
           />
         </div>
-        
-        <div className="space-y-6">
+
+        {/* Product Info */}
+        <div className="flex flex-col justify-between space-y-6">
           <div>
-            <Badge variant="outline">{getCategoryLabel(product.category)}</Badge>
-            <h1 className="text-3xl font-bold mt-2 mb-1">{product.name}</h1>
-            <div className="flex items-center mb-4">
-              <div className="flex items-center mr-3">
+            <Badge variant="outline" className="text-sm">
+              {getCategoryLabel(product.category)}
+            </Badge>
+            <h1 className="text-3xl font-bold mt-2">{product.name}</h1>
+
+            {/* Rating */}
+            <div className="flex items-center gap-2 mt-3">
+              <div className="flex">
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
@@ -87,22 +89,25 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   />
                 ))}
               </div>
-              <span className="text-sm font-medium">
+              <span className="text-sm text-muted-foreground">
                 {product.rating.toFixed(1)} ({product.numReviews} reviews)
               </span>
             </div>
-            <p className="text-lg font-medium mb-2">
-              ${product.price}
-            </p>
+
+            {/* Price */}
+            <p className="text-2xl font-semibold mt-4">${product.price}</p>
+
+            {/* Description */}
+            <div className="mt-6">
+              <h2 className="text-xl font-semibold mb-1">About This Product</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                {product.description}
+              </p>
+            </div>
           </div>
-          
-      <div className="mt-12 space-y-6">
-        <h2 className="text-2xl font-bold">About This Product</h2>
-        <div className="prose max-w-none">
-          <p>{product.description}</p>
-        </div>
-      </div>
-          <div className="pt-2">
+
+          {/* CTA Button */}
+          <div>
             <Button className="w-full mb-2">
               <ExternalLink className="w-4 h-4 mr-2" />
               View on Amazon
@@ -111,23 +116,25 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               *Purchase links may include affiliate codes
             </p>
           </div>
-
-        {product.expertSummary && (
-          <Card className="mt-8">
-            <CardHeader>
-              <CardTitle>Expert Insight</CardTitle>
-              <CardDescription>
-                Our fertility experts have analyzed this product
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>{product.expertSummary}</p>
-            </CardContent>
-          </Card>
-        )}
         </div>
       </div>
-      
+
+      {/* Expert Summary */}
+      {product.expertSummary && (
+        <Card className="mt-12">
+          <CardHeader>
+            <CardTitle>Expert Insight</CardTitle>
+            <CardDescription>
+              Our fertility experts have analyzed this product
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground leading-relaxed">
+              {product.expertSummary}
+            </p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
