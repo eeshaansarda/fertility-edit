@@ -25,7 +25,7 @@ const sortOptions = [
 
 export default function FilterPanel({ filters, onFilterChange, onReset }: FilterPanelProps) {
   return (
-    <div className="border rounded-lg p-4 space-y-6 sticky top-20">
+    <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="font-semibold">Filters</h3>
         <Button variant="ghost" size="sm" onClick={onReset}>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import ProductCard from "@/app/components/ProductCard";
 import { Product } from "@/lib/generated/prisma";
@@ -15,6 +15,7 @@ import { FilterState } from "@/types";
 const ProductsPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [showFilters, setShowFilters] = useState(false);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,69 +90,91 @@ const ProductsPage = () => {
   const resetFilters = () => {
     setFilters({});
     setSearchTerm("");
+    setShowFilters(false);
   };
+
+  // Count active filters
+  const activeFilterCount = Object.values(filters).filter(Boolean).length;
 
   return (
     <div className="container py-8">
-      <div className="flex flex-col items-center justify-center pb-8">
-        <form onSubmit={handleSearch} className="w-full max-w-md mx-auto mb-8">
-          <div className="relative">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+      <div className="flex flex-col items-center justify-center pb-4">
+        <div className="w-full max-w-3xl mx-auto flex gap-2">
+          <form onSubmit={handleSearch} className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </form>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={() => setShowFilters(!showFilters)}
+            className="relative"
+          >
+            <Filter className="h-4 w-4" />
+            {activeFilterCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground rounded-full w-4 h-4 text-xs flex items-center justify-center">
+                {activeFilterCount}
+              </span>
+            )}
+          </Button>
+        </div>
+        
+        {/* Toggleable Filter Panel */}
+        {showFilters && (
+          <div className="w-full max-w-3xl mx-auto mt-4 border rounded-lg p-4">
+            <FilterPanel
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onReset={resetFilters}
             />
           </div>
-        </form>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
-        <div className="lg:col-span-1">
-          <FilterPanel
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onReset={resetFilters}
-          />
-        </div>
-
-        <div className="lg:col-span-3">
-          <div className="mb-4 flex justify-between items-center">
-            <h2 className="text-xl font-semibold">
-              {products.length} Products Found
-            </h2>
+      <div className="w-full max-w-7xl mx-auto">
+        <div className="mb-4 flex justify-between items-center">
+          <h2 className="text-xl font-semibold">
+            {products.length} Products Found
+          </h2>
+          {activeFilterCount > 0 && (
             <Button variant="outline" size="sm" onClick={resetFilters}>
               Reset Filters
             </Button>
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-1 w-full max-w-7xl gap-3 md:gap-4">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="border rounded-lg p-4">
-                  <Skeleton className="h-10 w-full mb-4" />
-                  <Skeleton className="h-3 w-3/4 mb-2" />
-                  <Skeleton className="h-2 w-full mb-2" />
-                  <Skeleton className="h-1 w-1/2" />
-                </div>
-              ))}
-            </div>
-          ) : products.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12">
-              <p className="mb-4 text-lg text-muted-foreground">
-                No products found.
-              </p>
-              <Button onClick={resetFilters}>Reset Filters</Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 w-full max-w-7xl gap-3 md:gap-4">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
           )}
         </div>
+
+        {loading ? (
+          <div className="grid grid-cols-1 w-full gap-3 md:gap-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="border rounded-lg p-4">
+                <Skeleton className="h-10 w-full mb-4" />
+                <Skeleton className="h-3 w-3/4 mb-2" />
+                <Skeleton className="h-2 w-full mb-2" />
+                <Skeleton className="h-1 w-1/2" />
+              </div>
+            ))}
+          </div>
+        ) : products.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <p className="mb-4 text-lg text-muted-foreground">
+              No products found.
+            </p>
+            <Button onClick={resetFilters}>Reset Filters</Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 w-full gap-3 md:gap-4">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
