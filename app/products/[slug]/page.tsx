@@ -10,6 +10,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Product } from "@/lib/generated/prisma";
 
 export const dynamic = "force-dynamic";
@@ -53,10 +60,33 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     notFound();
   }
 
+  const categoryLabel = getCategoryLabel(product.category);
+
   return (
     <div className="container mx-auto p-4 md:p-10 max-w-6xl">
+      {/* Breadcrumb */}
+      <Breadcrumb className="mb-6">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/products">Products</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href={`/products?category=${product.category}`}>
+              {categoryLabel}
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="#" aria-current="page" className="truncate max-w-[150px] inline-block">
+              {product.name}
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
+      {/* Main Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Image */}
         <div className="relative aspect-square w-full overflow-hidden rounded-xl shadow">
           <Image
             src={product.imageUrl || ""}
@@ -67,15 +97,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           />
         </div>
 
-        {/* Product Info */}
         <div className="flex flex-col justify-between space-y-6">
           <div>
             <Badge variant="outline" className="text-sm">
-              {getCategoryLabel(product.category)}
+              {categoryLabel}
             </Badge>
             <h1 className="text-3xl font-bold mt-2">{product.name}</h1>
 
-            {/* Rating */}
             <div className="flex items-center gap-2 mt-3">
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
@@ -94,10 +122,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               </span>
             </div>
 
-            {/* Price */}
             <p className="text-2xl font-semibold mt-4">${product.price}</p>
 
-            {/* Description */}
             <div className="mt-6">
               <h2 className="text-xl font-semibold mb-1">About This Product</h2>
               <p className="text-muted-foreground leading-relaxed">
@@ -106,7 +132,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             </div>
           </div>
 
-          {/* CTA Button */}
           <div>
             <Button className="w-full mb-2">
               <ExternalLink className="w-4 h-4 mr-2" />
@@ -119,7 +144,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         </div>
       </div>
 
-      {/* Expert Summary */}
       {product.expertSummary && (
         <Card className="mt-12">
           <CardHeader>
