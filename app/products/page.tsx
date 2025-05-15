@@ -18,12 +18,15 @@ function ProductsContent() {
   const [showFilters, setShowFilters] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [localSearchTerm, setLocalSearchTerm] = useState("");
   const [filters, setFilters] = useState<FilterState>({});
   
-  // Initialize filters from URL whenever the query string changes
+  // Effect 1: Initialize state from URL parameters
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
+    const urlSearchTerm = params.get("search") || "";
+    
+    setLocalSearchTerm(urlSearchTerm);
     setFilters({
       category: params.get("category") as Category | undefined,
       minPrice: params.get("minPrice") ? Number(params.get("minPrice")) : undefined,
@@ -31,22 +34,14 @@ function ProductsContent() {
       minRating: params.get("minRating") ? Number(params.get("minRating")) : undefined,
       sort: params.get("sort") || undefined,
     });
-    setSearchTerm(params.get("search") || "");
   }, [searchParams]);
   
-  // Fetch products from API when filters or search term changes
+  // Effect 2: Fetch products based on current URL parameters
   useEffect(() => {
     async function fetchProducts() {
       setLoading(true);
-      const queryParams = new URLSearchParams();
-      if (filters.category) queryParams.set("category", filters.category);
-      if (filters.minPrice) queryParams.set("minPrice", filters.minPrice.toString());
-      if (filters.maxPrice) queryParams.set("maxPrice", filters.maxPrice.toString());
-      if (filters.minRating) queryParams.set("minRating", filters.minRating.toString());
-      if (filters.sort) queryParams.set("sort", filters.sort);
-      if (searchTerm) queryParams.set("search", searchTerm);
       try {
-        const response = await fetch(`/api/products?${queryParams.toString()}`);
+        const response = await fetch(`/api/products?${searchParams.toString()}`);
         if (!response.ok) throw new Error("Failed to fetch products");
         const data = await response.json();
         setProducts(data);
@@ -57,34 +52,72 @@ function ProductsContent() {
       }
     }
     fetchProducts();
-  }, [filters, searchTerm]);
-  
-  // Push filters to URL
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (filters.category) params.set("category", filters.category);
-    if (filters.minPrice) params.set("minPrice", filters.minPrice.toString());
-    if (filters.maxPrice) params.set("maxPrice", filters.maxPrice.toString());
-    if (filters.minRating) params.set("minRating", filters.minRating.toString());
-    if (filters.sort) params.set("sort", filters.sort);
-    if (searchTerm) params.set("search", searchTerm);
-    const newUrl = `/products?${params.toString()}`;
-    router.push(newUrl, { scroll: false });
-  }, [filters, searchTerm, router]);
+  }, [searchParams]);
   
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      e.preventDefault();
+      updateUrl();
     }
   };
   
+  const updateUrl = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    
+    // Update search parameter
+    if (localSearchTerm) {
+      params.set("search", localSearchTerm);
+    } else {
+      params.delete("search");
+    }
+    
+    // Update filter parameters
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        params.set(key, value.toString());
+      } else {
+        params.delete(key);
+      }
+    });
+    
+    const newUrl = `/products?${params.toString()}`;
+    router.push(newUrl, { scroll: false });
+  };
+  
   const handleFilterChange = (newFilters: Partial<FilterState>) => {
-    setFilters((prev) => ({ ...prev, ...newFilters }));
+    const updatedFilters = { ...filters, ...newFilters };
+    setFilters(updatedFilters);
+    
+    // Debounce URL updates for filter changes
+    const timeoutId = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString());
+      
+      // Update filter parameters
+      Object.entries(updatedFilters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          params.set(key, value.toString());
+        } else {
+          params.delete(key);
+        }
+      });
+      
+      // Preserve search term
+      if (localSearchTerm) {
+        params.set("search", localSearchTerm);
+      } else {
+        params.delete("search");
+      }
+      
+      const newUrl = `/products?${params.toString()}`;
+      router.push(newUrl, { scroll: false });
+    }, 300);
+    
+    return () => clearTimeout(timeoutId);
   };
   
   const resetFilters = () => {
     setFilters({});
-    setSearchTerm("");
+    setLocalSearchTerm("");
+    router.push("/products", { scroll: false });
     setShowFilters(false);
   };
   
@@ -99,8 +132,8 @@ function ProductsContent() {
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={localSearchTerm}
+              onChange={(e) => setLocalSearchTerm(e.target.value)}
               onKeyDown={handleSearch}
               className="pl-10"
             />
@@ -109,7 +142,7 @@ function ProductsContent() {
             variant="outline" 
             size="icon" 
             onClick={() => setShowFilters(!showFilters)}
-            className="relative"
+            className="relative hover:cursor-pointer"
           >
             <Filter className="h-4 w-4" />
             {activeFilterCount > 0 && (
@@ -117,6 +150,13 @@ function ProductsContent() {
                 {activeFilterCount}
               </span>
             )}
+          </Button>
+          <Button 
+            onClick={updateUrl}
+            size="sm"
+            className="hover:cursor-pointer"
+          >
+            Search
           </Button>
         </div>
         
@@ -132,15 +172,10 @@ function ProductsContent() {
         )}
       </div>
       <div className="w-full max-w-7xl mx-auto">
-        <div className="mb-4 flex justify-between items-center">
+        <div className="mb-4">
           <h2 className="text-xl font-semibold">
             {products.length} Products Found
           </h2>
-          {activeFilterCount > 0 && (
-            <Button variant="outline" size="sm" onClick={resetFilters}>
-              Reset Filters
-            </Button>
-          )}
         </div>
         {loading ? (
           <div className="grid grid-cols-1 w-full gap-3 md:gap-4">
