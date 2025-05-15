@@ -3,12 +3,12 @@ import prisma from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
 import { productSchema } from "@/app/productSchema";
 import { z } from "zod";
-import { Category } from "@/lib/generated/prisma";
+import { Category, Prisma } from "@/lib/generated/prisma";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-
-    // Parse filter parameters
+  
+  // Parse filter parameters
   const category = searchParams.get("category") as Category | undefined;
   const search = searchParams.get("search");
   const minPrice = searchParams.get("minPrice") ? Number(searchParams.get("minPrice")) : undefined;
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
   const sort = searchParams.get("sort");
   
   // Build query filters
-  const filters: any = {};
+  const filters: Prisma.ProductWhereInput = {};
   
   if (category) {
     filters.category = category;
@@ -30,12 +30,16 @@ export async function GET(request: NextRequest) {
     ];
   }
   
-  if (minPrice !== undefined) {
-    filters.price = { gte: minPrice };
-  }
-  
-  if (maxPrice !== undefined) {
-    filters.price = { ...filters.price, lte: maxPrice };
+  if (minPrice !== undefined || maxPrice !== undefined) {
+    filters.price = {};
+    
+    if (minPrice !== undefined) {
+      filters.price.gte = minPrice;
+    }
+    
+    if (maxPrice !== undefined) {
+      filters.price.lte = maxPrice;
+    }
   }
   
   if (minRating !== undefined) {
@@ -43,7 +47,7 @@ export async function GET(request: NextRequest) {
   }
   
   // Build sort options
-  let orderBy: any = { createdAt: 'desc' };
+  let orderBy: Prisma.ProductOrderByWithRelationInput = { createdAt: 'desc' };
   
   if (sort === 'price_asc') {
     orderBy = { price: 'asc' };
