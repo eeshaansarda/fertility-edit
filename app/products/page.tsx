@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import ProductCard from "@/app/components/ProductCard";
 import { Product } from "@/lib/generated/prisma";
@@ -125,9 +125,10 @@ function ProductsContent() {
   const activeFilterCount = Object.values(filters).filter(Boolean).length;
   
   return (
-    <div className="container py-8 mx-auto">
+    <div className="container py-4 sm:py-8 px-4 sm:px-6 mx-auto">
       <div className="flex flex-col items-center justify-center pb-4">
-        <div className="w-full max-w-3xl mx-auto flex gap-2">
+        {/* Search bar - stacked on mobile, horizontal on larger screens */}
+        <div className="w-full max-w-3xl mx-auto flex flex-col sm:flex-row gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -138,31 +139,34 @@ function ProductsContent() {
               className="pl-10"
             />
           </div>
-          <Button 
-            variant="outline" 
-            size="icon" 
-            onClick={() => setShowFilters(!showFilters)}
-            className="relative hover:cursor-pointer"
-          >
-            <Filter className="h-4 w-4" />
-            {activeFilterCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground rounded-full w-4 h-4 text-xs flex items-center justify-center">
-                {activeFilterCount}
-              </span>
-            )}
-          </Button>
-          <Button 
-            onClick={updateUrl}
-            size="sm"
-            className="hover:cursor-pointer"
-          >
-            Search
-          </Button>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={() => setShowFilters(!showFilters)}
+              className="relative hover:cursor-pointer"
+              aria-label={showFilters ? "Hide filters" : "Show filters"}
+            >
+              {showFilters ? <X className="h-4 w-4" /> : <Filter className="h-4 w-4" />}
+              {activeFilterCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground rounded-full w-4 h-4 text-xs flex items-center justify-center">
+                  {activeFilterCount}
+                </span>
+              )}
+            </Button>
+            <Button 
+              onClick={updateUrl}
+              size="sm"
+              className="hover:cursor-pointer flex-1 sm:flex-initial"
+            >
+              Search
+            </Button>
+          </div>
         </div>
         
         {/* Toggleable Filter Panel */}
         {showFilters && (
-          <div className="w-full max-w-3xl mx-auto mt-4 border rounded-lg p-4">
+          <div className="w-full max-w-3xl mx-auto mt-4 border rounded-lg p-3 sm:p-4">
             <FilterPanel
               filters={filters}
               onFilterChange={handleFilterChange}
@@ -171,17 +175,29 @@ function ProductsContent() {
           </div>
         )}
       </div>
+
       <div className="w-full max-w-7xl mx-auto">
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold">
+        <div className="mb-4 flex flex-col sm:flex-row justify-between sm:items-center">
+          <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-0">
             {products.length} Products Found
           </h2>
+          {activeFilterCount > 0 && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={resetFilters}
+              className="text-xs sm:text-sm self-start sm:self-auto"
+            >
+              Clear all filters
+            </Button>
+          )}
         </div>
+
         {loading ? (
           <div className="grid grid-cols-1 w-full gap-3 md:gap-4">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="border rounded-lg p-4">
-                <Skeleton className="h-10 w-full mb-4" />
+              <div key={i} className="border rounded-lg p-3 sm:p-4">
+                <Skeleton className="h-8 sm:h-10 w-full mb-3 sm:mb-4" />
                 <Skeleton className="h-3 w-3/4 mb-2" />
                 <Skeleton className="h-2 w-full mb-2" />
                 <Skeleton className="h-1 w-1/2" />
@@ -189,14 +205,14 @@ function ProductsContent() {
             ))}
           </div>
         ) : products.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12">
-            <p className="mb-4 text-lg text-muted-foreground">
-              No products found.
+          <div className="flex flex-col items-center justify-center py-8 sm:py-12">
+            <p className="mb-4 text-base sm:text-lg text-muted-foreground text-center px-4">
+              No products found. Try adjusting your search or filters.
             </p>
             <Button onClick={resetFilters}>Reset Filters</Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 w-full gap-3 md:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-1 w-full gap-3 sm:gap-4">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -210,23 +226,26 @@ function ProductsContent() {
 // Loading fallback component
 function ProductsLoading() {
   return (
-    <div className="container py-8 mx-auto">
+    <div className="container py-4 sm:py-8 px-4 sm:px-6 mx-auto">
       <div className="flex flex-col items-center justify-center pb-4">
-        <div className="w-full max-w-3xl mx-auto flex gap-2">
+        <div className="w-full max-w-3xl mx-auto flex flex-col sm:flex-row gap-2">
           <div className="relative flex-1">
             <Skeleton className="h-10 w-full" />
           </div>
-          <Skeleton className="h-10 w-10" />
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Skeleton className="h-10 w-10" />
+            <Skeleton className="h-10 w-16 sm:w-20 flex-1 sm:flex-initial" />
+          </div>
         </div>
       </div>
       <div className="w-full max-w-7xl mx-auto">
         <div className="mb-4">
-          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-7 sm:h-8 w-32 sm:w-48" />
         </div>
-        <div className="grid grid-cols-1 w-full gap-3 md:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-1 w-full gap-3 md:gap-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="border rounded-lg p-4">
-              <Skeleton className="h-10 w-full mb-4" />
+            <div key={i} className="border rounded-lg p-3 sm:p-4">
+              <Skeleton className="h-8 sm:h-10 w-full mb-3 sm:mb-4" />
               <Skeleton className="h-3 w-3/4 mb-2" />
               <Skeleton className="h-2 w-full mb-2" />
               <Skeleton className="h-1 w-1/2" />
