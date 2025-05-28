@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧬 Fertility Edit Platform
 
-## Getting Started
+**Live Demo**: [fertility-edit.vercel.app](https://fertility-edit.vercel.app/)  
 
-First, run the development server:
+## 📝 Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+**Fertility Edit** is a full-stack web platform that provides real reviews and expert insights on fertility products. Built with modern technologies, it offers a seamless user experience for individuals seeking trustworthy information in the fertility space.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- 🛍️ **Curated Product Listings**: Explore a wide range of fertility products with detailed information.
+- 🧑‍⚕️ **Expert Reviews**: Read reviews and insights from fertility experts to make informed decisions.
+- 📱 **Responsive Design**: Optimized for all devices to ensure accessibility and usability.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Tech Stack
 
-## Learn More
+- **Frontend**: Next.js 14, Tailwind CSS, Shadcn/UI
+- **Backend**: Next.js API Routes, Prisma ORM
+- **Database**: PostgreSQL
+- **Deployment**: Vercel
 
-To learn more about Next.js, take a look at the following resources:
+## 🧰 Getting Started
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Prerequisites
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Node.js (v18 or later)
+- PostgreSQL database
 
-## Deploy on Vercel
+### Installation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. **Clone the repository**:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```bash
+   git clone https://github.com/eeshaansarda/fertility-edit.git
+   cd fertility-edit
+````
+
+2. **Install dependencies**:
+
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables**:
+
+   Create a `.env` file in the root directory and add the following:
+
+   ```env
+   DATABASE_URL=your_postgresql_database_url
+   ```
+
+4. **Set up the database**:
+
+   ```bash
+   npx prisma migrate dev --name init
+   ```
+
+5. **Run the development server**:
+
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000) in your browser to view the application.
+
+---
+
+*Empowering individuals with reliable information on fertility products.*
