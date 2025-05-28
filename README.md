@@ -33,7 +33,7 @@
    ```bash
    git clone https://github.com/eeshaansarda/fertility-edit.git
    cd fertility-edit
-````
+   ```
 
 2. **Install dependencies**:
 
