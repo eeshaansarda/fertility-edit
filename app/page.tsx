@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button';
-import { ArrowDown } from 'lucide-react';
 import Link from 'next/link';
 
 export const metadata = {
