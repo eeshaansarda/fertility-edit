@@ -23,12 +23,6 @@ export default function Home() {
           </Link>
         </Button>
       </div>
-      
-      <div className="mt-16 animate-bounce">
-        <Link href="/products">
-          <ArrowDown size={24} />
-        </Link>
-      </div>
     </section>
   );
 }
